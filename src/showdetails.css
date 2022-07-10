@@ -1,0 +1,13 @@
+.styling {
+  background-color: rgb(146, 29, 192);
+  color: rgb(195, 231, 222);
+  border: 1px solid rgb(238, 75, 200);
+  width: auto;
+  height: auto;
+  border-radius: 22px;
+  font-size:20px;
+  padding: 30px;
+  font-weight: 800;
+  margin: 50px;
+  word-spacing: 10px;
+}

@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 
 import { gql, useQuery } from "@apollo/client";
+import ShowDetails from "./components/ShowDetails";
 
-const continent = gql`
+const CONTINENT = gql`
   query continent {
     continents {
       code
@@ -11,7 +12,7 @@ const continent = gql`
   }
 `;
 
-const allCountries = gql`
+const ALL_COUNTRIES = gql`
   query findmyCountry($code: ID!) {
     continent(code: $code) {
       name
@@ -22,21 +23,45 @@ const allCountries = gql`
     }
   }
 `;
+
+const COUNTRY_DETAILS = gql`
+  query countryDetails($code: ID!) {
+    country(code: $code) {
+      name
+      capital
+      phone
+      currency
+      languages {
+        name
+        native
+      }
+    }
+  }
+`;
+
 const App = () => {
-  const { data, loading } = useQuery(continent);
+  const { data, loading } = useQuery(CONTINENT);
 
   const [continents2, setContinents2] = useState();
-  const [code, setCode] = useState("AS");
+  const [code, setCode] = useState();
+  const [countryCode, setCountryCode] = useState("");
   const [countriesData, setCountriesData] = useState();
+  const [countryDetails, setCountryDetails] = useState();
 
   const { data: theirCountry, loading: loadingCountries } = useQuery(
-    allCountries,
+    ALL_COUNTRIES,
     {
       variables: {
         code: code,
       },
     }
   );
+
+  const { data: data2 } = useQuery(COUNTRY_DETAILS, {
+    variables: {
+      code: countryCode,
+    },
+  });
 
   useEffect(() => {
     if (data) {
@@ -50,11 +75,21 @@ const App = () => {
     }
   }, [theirCountry]);
 
-  // console.log(countriesData);
+  useEffect(() => {
+    if (data2) {
+      setCountryDetails(data2.country);
+      // console.log(countryDetails);
+    }
+  }, [data2]);
 
   const handleChange = (event) => {
     setCode(event.target.value);
-    console.log(code, "state");
+    // console.log(code, "state");
+  };
+
+  const handleChangeCountryCode = (event) => {
+    setCountryCode(event.target.value);
+    // console.log(countryCode, "country code");
   };
 
   return (
@@ -83,10 +118,17 @@ const App = () => {
         <ol>
           {countriesData &&
             countriesData.continent.countries.map((x) => (
-              <button key={x.code}>{x.name}</button>
+              <button
+                key={x.code}
+                value={x.code}
+                onClick={handleChangeCountryCode}
+              >
+                {x.name}
+              </button>
             ))}
         </ol>
       )}
+      {countryDetails && <ShowDetails theData={countryDetails} />}
     </>
   );
 };
